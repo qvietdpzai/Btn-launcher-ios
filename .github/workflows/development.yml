@@ -17,25 +17,38 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
-      - name: Setup Java 8 (required cho build)
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '8'
-
-      - name: Install dependencies
+      - name: Install Homebrew dependencies
         run: |
           brew update
-          brew install make cmake wget coreutils ldid
+          brew install make cmake wget coreutils
 
-      - name: Build IPA (dùng cho Esign/AltStore/SideStore)
+      - name: Install ldid
+        run: |
+          curl -Lo /tmp/ldid https://github.com/itsnebulalol/ldid-macos/releases/latest/download/ldid
+          chmod +x /tmp/ldid
+          sudo mv /tmp/ldid /usr/local/bin/ldid
+          ldid --version || echo "ldid installed"
+
+      - name: Setup Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+          architecture: x64
+
+      - name: Build IPA (cho Esign/AltStore/SideStore)
         run: |
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:$JAVA_HOME/bin:$PATH"
           export SDKPATH=$(xcrun --sdk iphoneos --show-sdk-path)
           export BOOTJDK=$JAVA_HOME/bin
+          echo "JAVA_HOME=$JAVA_HOME"
+          echo "BOOTJDK=$BOOTJDK"
+          echo "SDKPATH=$SDKPATH"
+          echo "PATH=$PATH"
+          $JAVA_HOME/bin/javac -version
           gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2
 
-      - name: Build TIPA (dùng cho TrollStore - JIT tốt hơn)
+      - name: Build TIPA (TrollStore - JIT auto)
         run: |
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:$JAVA_HOME/bin:$PATH"
           export SDKPATH=$(xcrun --sdk iphoneos --show-sdk-path)
