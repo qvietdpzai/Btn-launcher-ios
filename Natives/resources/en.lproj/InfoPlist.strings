@@ -1,0 +1,3 @@
+/* Localized versions of Info.plist keys */
+"Btn Launcher uses the local network to find and communicate with AltServer and LAN servers." = "Btn Launcher uses the local network to find and communicate with AltServer and LAN servers.";
+"Btn Launcher uses the microphone to enable support for voice chat mods." = "Btn Launcher uses the microphone to enable support for voice chat mods.";
