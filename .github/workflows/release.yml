@@ -19,32 +19,40 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
-      - name: Install Homebrew dependencies
+      - name: Setup Java 8
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: '8'
+
+      - name: Install build tools
+        env:
+          HOMEBREW_NO_REQUIRE_TAP_TRUST: 1
         run: |
           brew update
           brew install make cmake wget coreutils
 
       - name: Install ldid
         run: |
-          curl -Lo /tmp/ldid https://github.com/itsnebulalol/ldid-macos/releases/latest/download/ldid
+          curl -sL -o /tmp/ldid \
+            "https://github.com/ProcursusTeam/ldid/releases/download/v2.1.5-procursus7/ldid_macosx_arm64"
           chmod +x /tmp/ldid
-          sudo mv /tmp/ldid /usr/local/bin/ldid
-          ldid --version || echo "ldid installed"
-
-      - name: Setup Java 8
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '8'
-          architecture: x64
+          sudo cp /tmp/ldid /usr/local/bin/ldid
+          ldid -v || echo "ldid OK"
 
       - name: Build IPA
         run: |
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:$JAVA_HOME/bin:$PATH"
           export SDKPATH=$(xcrun --sdk iphoneos --show-sdk-path)
           export BOOTJDK=$JAVA_HOME/bin
+          echo "=== DEBUG ==="
           echo "JAVA_HOME=$JAVA_HOME"
           echo "BOOTJDK=$BOOTJDK"
+          echo "SDKPATH=$SDKPATH"
+          echo "which cmake: $(which cmake)"
+          echo "which ldid: $(which ldid)"
+          echo "which gmake: $(which gmake)"
+          echo "============="
           gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2
 
       - name: Build TIPA (TrollStore)
