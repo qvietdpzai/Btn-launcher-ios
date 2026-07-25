@@ -152,13 +152,10 @@ METHOD_PACKAGE = \
 # Function to download and unpack Java runtimes.
 METHOD_JAVA_UNPACK = \
 	cd $(SOURCEDIR)/depends; \
-	if [ ! -f "java-$(1)-openjdk/release" ] && [ ! -f "$(ls jre$(1)-*.tar.xz)" ]; then \
-		if [ "$(RUNNER)" != "1" ]; then \
-			wget '$(2)' -q --show-progress; \
-			unzip jre*-ios-aarch64.zip && rm jre*-ios-aarch64.zip; \
-		fi; \
+	if [ ! -f "java-$(1)-openjdk/release" ]; then \
 		mkdir -p java-$(1)-openjdk; \
-		tar xvf jre$(1)-*.tar.xz -C java-$(1)-openjdk; \
+		wget '$(2)' -q --show-progress -O "jre$(1)-ios-aarch64-release.tar.xz"; \
+		tar xvf "jre$(1)-ios-aarch64-release.tar.xz" -C java-$(1)-openjdk; \
 	fi
 
 # Function to codesign binaries.
@@ -275,19 +272,17 @@ jre: native
 	echo '[BtnLauncher v$(VERSION)] jre - start'
 	mkdir -p $(SOURCEDIR)/depends
 	cd $(SOURCEDIR)/depends; \
-	$(call METHOD_JAVA_UNPACK,8,'https://nightly.link/PojavLauncherTeam/android-openjdk-build-multiarch/workflows/build/buildjre8/jre8-ios-aarch64.zip'); \
-	$(call METHOD_JAVA_UNPACK,17,'https://nightly.link/PojavLauncherTeam/android-openjdk-build-multiarch/workflows/build/buildjre17-21/jre17-ios-aarch64.zip'); \
-	$(call METHOD_JAVA_UNPACK,21,'https://nightly.link/PojavLauncherTeam/android-openjdk-build-multiarch/workflows/build/buildjre17-21/jre21-ios-aarch64.zip'); \
-	if [ -f "$(ls jre*.tar.xz)" ]; then rm $(SOURCEDIR)/depends/jre*.tar.xz; fi; \
+	$(call METHOD_JAVA_UNPACK,8,'https://github.com/PojavLauncherTeam/android-openjdk-build-multiarch/releases/download/jre8-40df388/jre8-arm64-20220811-release.tar.xz'); \
+	$(call METHOD_JAVA_UNPACK,17,'https://github.com/PojavLauncherTeam/android-openjdk-build-multiarch/releases/download/jre17-ca01427/jre17-arm64-20220817-release.tar.xz'); \
+	mkdir -p java-21-openjdk; \
+	rm -f jre*-ios-aarch64-release.tar.xz; \
 	cd $(SOURCEDIR); \
 	rm -rf $(SOURCEDIR)/depends/java-*-openjdk/{ASSEMBLY_EXCEPTION,bin,include,jre,legal,LICENSE,man,THIRD_PARTY_README,lib/{ct.sym,jspawnhelper,libjsig.dylib,src.zip,tools.jar}}; \
 	$(call METHOD_DIRCHECK,$(OUTPUTDIR)/java_runtimes); \
 	cp -R $(BTN_JRE8_DIR) $(OUTPUTDIR)/java_runtimes; \
 	cp -R $(BTN_JRE17_DIR) $(OUTPUTDIR)/java_runtimes; \
-	cp -R $(BTN_JRE21_DIR) $(OUTPUTDIR)/java_runtimes; \
 	cp $(WORKINGDIR)/libawt_xawt.dylib $(OUTPUTDIR)/java_runtimes/java-8-openjdk/lib; \
-	cp $(WORKINGDIR)/libawt_xawt.dylib $(OUTPUTDIR)/java_runtimes/java-17-openjdk/lib;
-	cp $(WORKINGDIR)/libawt_xawt.dylib $(OUTPUTDIR)/java_runtimes/java-21-openjdk/lib
+	cp $(WORKINGDIR)/libawt_xawt.dylib $(OUTPUTDIR)/java_runtimes/java-17-openjdk/lib
 	echo '[BtnLauncher v$(VERSION)] jre - end'
 
 assets:
