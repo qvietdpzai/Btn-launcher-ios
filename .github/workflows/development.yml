@@ -53,7 +53,7 @@ jobs:
           echo "which wget: $(which wget)"
           echo "which gmake: $(which gmake)"
           echo "============="
-          gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2
+          gmake -j1 dsym package PLATFORM=2
 
       - name: Build TIPA (TrollStore)
         run: |
