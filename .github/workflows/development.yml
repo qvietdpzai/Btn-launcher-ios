@@ -41,6 +41,7 @@ jobs:
 
       - name: Build IPA
         run: |
+          set -x
           export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:$JAVA_HOME/bin:$PATH"
           export SDKPATH=$(xcrun --sdk iphoneos --show-sdk-path)
           export BOOTJDK=$JAVA_HOME/bin
