@@ -19,32 +19,32 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
+      - name: Setup Java 8 (required cho build)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+
       - name: Install dependencies
         run: |
           brew update
-          brew install make cmake wget coreutils ldid openjdk@8
+          brew install make cmake wget coreutils ldid
 
       - name: Build IPA
         run: |
-          export PATH="/opt/homebrew/opt/openjdk@8/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+          export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:$JAVA_HOME/bin:$PATH"
           export SDKPATH=$(xcrun --sdk iphoneos --show-sdk-path)
-          export BOOTJDK=/opt/homebrew/opt/openjdk@8/bin
+          export BOOTJDK=$JAVA_HOME/bin
           gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2
 
       - name: Build TIPA (TrollStore)
         run: |
-          export PATH="/opt/homebrew/opt/openjdk@8/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+          export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:$JAVA_HOME/bin:$PATH"
           export SDKPATH=$(xcrun --sdk iphoneos --show-sdk-path)
-          export BOOTJDK=/opt/homebrew/opt/openjdk@8/bin
+          export BOOTJDK=$JAVA_HOME/bin
           gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2 TROLLSTORE_JIT_ENT=1
 
-      - name: List artifacts
-        run: |
-          ls -la artifacts/
-          echo "IPA_PATH=$(ls artifacts/*.ipa | head -1)" >> $GITHUB_ENV
-          echo "TIPA_PATH=$(ls artifacts/*.tipa | head -1)" >> $GITHUB_ENV
-
-      - name: Create Release
+      - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.event.inputs.version }}
@@ -63,10 +63,10 @@ jobs:
             ## Yêu cầu:
             - iOS 14.0+
             - iPhone/iPad
-            - Cần JIT để chạy (TrullStore có JIT tự động, Esign cần kích hoạt JIT riêng)
+            - Cần JIT để chạy (TrollStore có JIT tự động)
           files: |
-            artifacts/*.ipa
-            artifacts/*.tipa
+            artifacts/com.btnlauncher.ios-*-ios.ipa
+            artifacts/com.btnlauncher.ios-*-ios-trollstore.tipa
           draft: false
           prerelease: false
         env:

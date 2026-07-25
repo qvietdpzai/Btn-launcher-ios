@@ -17,23 +17,29 @@ jobs:
       - name: Checkout submodules
         run: git submodule update --init --recursive
 
+      - name: Setup Java 8 (required cho build)
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '8'
+
       - name: Install dependencies
         run: |
           brew update
-          brew install make cmake wget coreutils ldid openjdk@8
+          brew install make cmake wget coreutils ldid
 
       - name: Build IPA (dùng cho Esign/AltStore/SideStore)
         run: |
-          export PATH="/opt/homebrew/opt/openjdk@8/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+          export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:$JAVA_HOME/bin:$PATH"
           export SDKPATH=$(xcrun --sdk iphoneos --show-sdk-path)
-          export BOOTJDK=/opt/homebrew/opt/openjdk@8/bin
+          export BOOTJDK=$JAVA_HOME/bin
           gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2
 
       - name: Build TIPA (dùng cho TrollStore - JIT tốt hơn)
         run: |
-          export PATH="/opt/homebrew/opt/openjdk@8/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+          export PATH="/opt/homebrew/opt/make/libexec/gnubin:/opt/homebrew/bin:/usr/local/bin:$JAVA_HOME/bin:$PATH"
           export SDKPATH=$(xcrun --sdk iphoneos --show-sdk-path)
-          export BOOTJDK=/opt/homebrew/opt/openjdk@8/bin
+          export BOOTJDK=$JAVA_HOME/bin
           gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2 TROLLSTORE_JIT_ENT=1
 
       - name: Upload IPA - tải về import Esign
