@@ -249,7 +249,7 @@ check:
 native:
 	echo '[BtnLauncher v$(VERSION)] native - start'
 	mkdir -p $(WORKINGDIR)
-	cmake -B $(WORKINGDIR) -S $(SOURCEDIR)/Natives \
+	cd $(WORKINGDIR) && cmake .. \
 		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) \
 		-DCMAKE_CROSSCOMPILING=true \
 		-DCMAKE_SYSTEM_NAME=Darwin \
