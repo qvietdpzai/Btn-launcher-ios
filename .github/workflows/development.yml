@@ -14,7 +14,7 @@ jobs:
       - name: Checkout repository with submodules
         uses: actions/checkout@main
         with:
-          submodules: true
+          submodules: recursive
           fetch-depth: 0
 
       - name: Setup Java 8
@@ -53,7 +53,7 @@ jobs:
           echo "which wget: $(which wget)"
           echo "which gmake: $(which gmake)"
           echo "============="
-          gmake -j1 dsym package PLATFORM=2
+          gmake -j$(sysctl -n hw.ncpu) dsym package PLATFORM=2
 
       - name: Build TIPA (TrollStore)
         run: |
