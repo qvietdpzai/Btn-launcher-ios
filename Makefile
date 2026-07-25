@@ -258,6 +258,12 @@ native:
 		-DCONFIG_COMMIT="$(COMMIT)" \
 		-DCONFIG_RELEASE=$(RELEASE)
 
+	cd $(SOURCEDIR)/Natives/resources/Frameworks; \
+	for f in *.framework-*; do \
+		dir="$${f%-*}"; \
+		bin="$${f#*-}"; \
+		if [ -f "$$dir/$$bin" ]; then echo "OK $$dir/$$bin"; else ln -sf "../$$f" "$$dir/$$bin"; fi; \
+	done
 	cmake --build $(WORKINGDIR) --config $(CMAKE_BUILD_TYPE) -j$(JOBS)
 	#	--target awt_headless awt_xawt libOSMesaOverride.dylib tinygl4angle BtnLauncher
 	rm -f $(WORKINGDIR)/libawt_headless.dylib
