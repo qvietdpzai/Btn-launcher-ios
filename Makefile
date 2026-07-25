@@ -249,6 +249,11 @@ check:
 native:
 	echo '[BtnLauncher v$(VERSION)] native - start'
 	mkdir -p $(WORKINGDIR)
+	echo "DEBUG: PWD=$$PWD"
+	echo "DEBUG: SOURCEDIR=$(SOURCEDIR)"
+	echo "DEBUG: WORKINGDIR=$(WORKINGDIR)"
+	ls -la "$(SOURCEDIR)/Natives/main.m" 2>&1 || echo "MISSING: main.m"
+	ls -la "$(SOURCEDIR)/Natives/external/AFNetworking/AFNetworking/AFSecurityPolicy.m" 2>&1 || echo "MISSING: AFNetworking"
 	cd $(WORKINGDIR) && cmake .. \
 		-DCMAKE_BUILD_TYPE=$(CMAKE_BUILD_TYPE) \
 		-DCMAKE_CROSSCOMPILING=true \
