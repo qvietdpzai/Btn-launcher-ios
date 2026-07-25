@@ -261,7 +261,7 @@ native:
 		-DCONFIG_COMMIT="$(COMMIT)" \
 		-DCONFIG_RELEASE=$(RELEASE)
 
-	cmake --build $(WORKINGDIR) --config $(CMAKE_BUILD_TYPE) -j$(JOBS) --verbose
+	cmake --build $(WORKINGDIR) --config $(CMAKE_BUILD_TYPE) -j$(JOBS)
 	#	--target awt_headless awt_xawt libOSMesaOverride.dylib tinygl4angle BtnLauncher
 	rm -f $(WORKINGDIR)/libawt_headless.dylib
 	echo '[BtnLauncher v$(VERSION)] native - end'
